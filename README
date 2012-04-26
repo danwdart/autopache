@@ -1,5 +1,5 @@
 Autopache, version 0.1. Written by Dan Dart
-License: Public Domain (or equivalent)
+License: MIT
 
 Autopache is a tool written in bash to automatically setup Apache vhosts
 under Debian-based systems.
