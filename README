@@ -1,0 +1,22 @@
+Autopache, version 0.1. Written by Dan Dart
+License: Public Domain (or equivalent)
+
+Autopache is a tool written in bash to automatically setup Apache vhosts
+under Debian-based systems.
+
+To install, run:
+$ sudo ./install.sh
+
+To setup a vhost, go to the public directory and run:
+$ sudo autopache.sh [vhostname]
+
+This will setup the vhost for you using the template included,
+add an entry to your /etc/hosts file and restart Apache.
+
+You can optionally use the following parameters:
+
+$ sudo autopache.sh [vhostname] --delete
+Deletes the vhost entry and hosts entry and restart Apache
+
+$ sudo autopache.sh [vhostname] --open
+When finished, opens your default browser displaying the new vhost page.
