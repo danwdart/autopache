@@ -22,12 +22,7 @@ CURDIR=$(pwd)
 NAMEENTRY="{{NAME}}"
 RELEASE=`cat /etc/*release`
 # Now determine the distro name and set VHOSTDIR as appropriate
-if [[ $RELEASE == *Ubuntu* ]]
-then
-    VHOSTDIR=/etc/apache2/sites-available
-    RELEASENAME=Debian
-    SUFFIX=
-elif [[ $RELEASE == *Debian* ]]
+if [[ $RELEASE == *Ubuntu* || $RELEASE == *Debian* ]]
 then
     VHOSTDIR=/etc/apache2/sites-available
     RELEASENAME=Debian
