@@ -1,4 +1,4 @@
-Autopache, version 0.1. Written by Dan Dart
+Autopache, version 0.3. Written by Dan Dart
 License: MIT
 
 Autopache is a tool written in bash to automatically setup Apache vhosts
@@ -20,3 +20,7 @@ Deletes the vhost entry and hosts entry and restart Apache
 
 $ sudo autopache.sh [vhostname] --open
 When finished, opens your default browser displaying the new vhost page.
+
+To remove the program without the configuration files, use the following options:
+$ sudo autopache.sh --remove # Removes only the program
+$ sudo autopache.sh --purge # Removes the program and the configuration file.

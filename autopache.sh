@@ -1,14 +1,58 @@
 #Autopache - automatically setup a vhost for you, right here
-# Syntax: autopache.sh yourlocaldomain.local
-# Parameter 2:
-#  --delete - deletes the vhost
-#  --open - opens in browser 
+
 #!/bin/bash
-echo "Autopache, version 0.2. Author: Dan Dart. License: Public Domain (or equivalent)"
+echo "Autopache, version 0.3. Author: Dan Dart. License: MIT"
+
+if [ "--help" == "$1" ]
+then
+    echo "Syntax: $0 yourlocaldomain.local"
+    echo "Note: Must be run as root as it modifies your apache config and hosts file."
+    echo "Parameter 3 (optional):"
+    echo "  --delete - deletes the vhost"
+    echo "  --open - opens in browser"
+    echo "Other options:"
+    echo "$0 --remove - removes the program keeping the configuration file intact."
+    echo "$0 --purge - removes both the program and the configuration file."
+    exit 0
+fi
+
 if [ "0" -ne "$UID" ]
 then
 	echo "This program must be run as root (as it requires permissions to edit apache, hosts & restart apache)"
 	exit 1
+fi
+
+if [ "--remove" == "$1" ]
+then
+    echo "REMOVING Autopache..."
+    read -r -p "Are you sure? This will remove Autopache from the system directories, keeping the configuration file intact [y/N] " response
+    response=${response,,} # tolower
+    if [[ $response =~ ^(yes|y)$ ]]
+    then
+        rm /usr/bin/autopache.sh
+        echo Done.
+        exit 0
+    else
+        echo Aborted.
+        exit 1
+    fi
+fi
+
+if [ "--purge" == "$1" ]
+then
+    echo "PURGING Autopache..."
+    read -r -p "Are you sure? This will remove Autopache and its configuration file from the system directories [y/N] " response
+    response=${response,,} # tolower
+    if [[ $response =~ ^(yes|y)$ ]]
+    then
+        rm /usr/bin/autopache.sh
+        rm /etc/autopache.conf
+        echo Done.
+        exit 0
+    else
+        echo Aborted.
+        exit 1
+    fi
 fi
 
 SITENAME=$1
@@ -22,12 +66,7 @@ CURDIR=$(pwd)
 NAMEENTRY="{{NAME}}"
 RELEASE=`cat /etc/*release`
 # Now determine the distro name and set VHOSTDIR as appropriate
-if [[ $RELEASE == *Ubuntu* ]]
-then
-    VHOSTDIR=/etc/apache2/sites-available
-    RELEASENAME=Debian
-    SUFFIX=
-elif [[ $RELEASE == *Debian* ]]
+if [[ $RELEASE == *Ubuntu* || $RELEASE == *Debian*]]
 then
     VHOSTDIR=/etc/apache2/sites-available
     RELEASENAME=Debian
@@ -81,3 +120,5 @@ then
 	USER=$(who am i | gawk '{print $1}')
 	su - $USER xdg-open http://$SITENAME/
 fi
+
+
