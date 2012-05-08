@@ -4,7 +4,7 @@
 #  --delete - deletes the vhost
 #  --open - opens in browser 
 #!/bin/bash
-echo "Autopache, version 0.1. Author: Dan Dart. License: Public Domain (or equivalent)"
+echo "Autopache, version 0.2. Author: Dan Dart. License: Public Domain (or equivalent)"
 if [ "0" -ne "$UID" ]
 then
 	echo "This program must be run as root (as it requires permissions to edit apache, hosts & restart apache)"
@@ -20,31 +20,59 @@ fi
 DIRENTRY="{{DIR}}"
 CURDIR=$(pwd)
 NAMEENTRY="{{NAME}}"
-SITESAVAILABLE=/etc/apache2/sites-available
+RELEASE=`cat /etc/*release`
+# Now determine the distro name and set VHOSTDIR as appropriate
+if [[ $RELEASE == *Ubuntu* ]]
+then
+    VHOSTDIR=/etc/apache2/sites-available
+    RELEASENAME=Debian
+    SUFFIX=
+elif [[ $RELEASE == *Debian* ]]
+then
+    VHOSTDIR=/etc/apache2/sites-available
+    RELEASENAME=Debian
+    SUFFIX=
+elif [[ $RELEASE == *Gentoo* ]]
+then
+    VHOSTDIR=/etc/apache2/vhosts.d
+    RELEASENAME=Gentoo
+    SUFFIX=.conf
+else
+    echo "Unknown distribution release. Please contact the author at dandart@googlemail.com."
+    exit 1
+fi
 
 if [ "--delete" == "$2" ]
 then
-a2dissite $SITENAME
-/etc/init.d/apache2 restart
-rm $SITESAVAILABLE/$SITENAME
+
+    if [[ $RELEASENAME == Debian ]]
+    then
+        a2dissite $SITENAME
+    fi
+rm $VHOSTDIR/$SITENAME$SUFFIX
 sed -i "s%^.*$SITENAME.*$%%g" /etc/hosts
+/etc/init.d/apache2 restart
 exit 0
 fi
 
 if [ -e ./autopache.conf ]
 then
-	cp ./autopache.conf $SITESAVAILABLE/$SITENAME
+	cp ./autopache.conf $VHOSTDIR/$SITENAME$SUFFIX
 elif [ -e /etc/autopache.conf ]
 then
-	cp /etc/autopache.conf $SITESAVAILABLE/$SITENAME
+	cp /etc/autopache.conf $VHOSTDIR/$SITENAME$SUFFIX
 else
 	echo "You plonker - where's autopache.conf?"
 fi
 
-sed -i "s%$DIRENTRY%$CURDIR%g" $SITESAVAILABLE/$SITENAME
-sed -i "s%$NAMEENTRY%$SITENAME%g" $SITESAVAILABLE/$SITENAME
+sed -i "s%$DIRENTRY%$CURDIR%g" $VHOSTDIR/$SITENAME$SUFFIX
+sed -i "s%$NAMEENTRY%$SITENAME%g" $VHOSTDIR/$SITENAME$SUFFIX
 
-a2ensite $SITENAME
+if [[ $RELEASENAME == Debian ]]
+then
+    a2ensite $SITENAME
+fi
+
 /etc/init.d/apache2 restart
 echo 127.0.0.1 $SITENAME >> /etc/hosts
 
