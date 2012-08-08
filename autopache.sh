@@ -71,7 +71,7 @@ then
     VHOSTDIR=/etc/apache2/sites-available
     RELEASENAME=Debian
     SUFFIX=
-elif [[ $RELEASE == *Gentoo* ]]
+elif [[ $RELEASE == *Gentoo* || $RELEASE == *Funtoo* ]]
 then
     VHOSTDIR=/etc/apache2/vhosts.d
     RELEASENAME=Gentoo
