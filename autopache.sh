@@ -1,6 +1,6 @@
+#!/bin/bash
 #Autopache - automatically setup a vhost for you, right here
 
-#!/bin/bash
 echo "Autopache, version 0.3. Author: Dan Dart. License: MIT"
 
 if [ "--help" == "$1" ]
