@@ -1,7 +1,7 @@
 #!/bin/bash
 #Autopache - automatically setup a vhost for you, right here
 
-echo "Autopache, version 0.3. Author: Dan Dart. License: MIT"
+echo "Autopache, version 1.0. Author: Dan Dart. License: MIT"
 
 if [ "--help" == "$1" ]
 then
@@ -70,14 +70,14 @@ if [[ $RELEASE == *Ubuntu* || $RELEASE == *Debian* ]]
 then
     VHOSTDIR=/etc/apache2/sites-available
     RELEASENAME=Debian
-    SUFFIX=
+    SUFFIX=.conf
 elif [[ $RELEASE == *Gentoo* || $RELEASE == *Funtoo* ]]
 then
     VHOSTDIR=/etc/apache2/vhosts.d
     RELEASENAME=Gentoo
     SUFFIX=.conf
 else
-    echo "Unknown distribution release. Please contact the author at dandart@googlemail.com."
+    echo "Unknown distribution release. Please contact the author at autopache@dandart.co.uk"
     exit 1
 fi
 
@@ -101,7 +101,7 @@ elif [ -e /etc/autopache.conf ]
 then
 	cp /etc/autopache.conf $VHOSTDIR/$SITENAME$SUFFIX
 else
-	echo "You plonker - where's autopache.conf?"
+	echo "You silly billy - I can't find autopache.conf in /etc or the current directory."
 fi
 
 sed -i "s%$DIRENTRY%$CURDIR%g" $VHOSTDIR/$SITENAME$SUFFIX
