@@ -1,7 +1,7 @@
 #!/bin/bash
 #Autopache - automatically setup a vhost for you, right here
 
-echo "Autopache, version 1.0. Author: Dan Dart. License: MIT"
+echo "Autopache, version 1.1. Author: Dan Dart. License: MIT"
 
 if [ "--help" == "$1" ]
 then
@@ -18,8 +18,8 @@ fi
 
 if [ "0" -ne "$UID" ]
 then
-	echo "This program must be run as root (as it requires permissions to edit apache, hosts & restart apache)"
-	exit 1
+        echo "This program must be run as root (as it requires permissions to edit apache, hosts & restart apache)"
+        exit 1
 fi
 
 if [ "--remove" == "$1" ]
@@ -58,12 +58,13 @@ fi
 SITENAME=$1
 if [ -z "$1" ]
 then
-	echo "Usage: autopache.sh server-name-here.tld [--delete|--open]"
-	exit 255 
+        echo "Usage: autopache.sh server-name-here.tld [--delete|--open]"
+        exit 255 
 fi
 DIRENTRY="{{DIR}}"
 CURDIR=$(pwd)
 NAMEENTRY="{{NAME}}"
+LOGPATHENTRY="{{LOGPATH}}"
 RELEASE=`cat /etc/*release`
 # Now determine the distro name and set VHOSTDIR as appropriate
 if [[ $RELEASE == *Ubuntu* || $RELEASE == *Debian* ]]
@@ -71,11 +72,19 @@ then
     VHOSTDIR=/etc/apache2/sites-available
     RELEASENAME=Debian
     SUFFIX=.conf
+    LOGPATH=/var/log/apache2
 elif [[ $RELEASE == *Gentoo* || $RELEASE == *Funtoo* ]]
 then
     VHOSTDIR=/etc/apache2/vhosts.d
     RELEASENAME=Gentoo
     SUFFIX=.conf
+    LOGPATH=/var/log/apache2
+elif [[ $RELEASE == *Amazon* ]]
+then
+    VHOSTDIR=/etc/httpd/conf.d
+    RELEASENAME=Amazon
+    SUFFIX=.conf
+    LOGPATH=/var/log/httpd
 else
     echo "Unknown distribution release. Please contact the author at autopache@dandart.co.uk"
     exit 1
@@ -90,35 +99,45 @@ then
     fi
 rm $VHOSTDIR/$SITENAME$SUFFIX
 sed -i "s%^.*$SITENAME.*$%%g" /etc/hosts
-/etc/init.d/apache2 restart
+if [[ $RELEASENAME == Amazon ]]
+then
+    /etc/init.d/httpd restart
+else
+    /etc/init.d/apache2 restart
+fi
 exit 0
 fi
 
 if [ -e ./autopache.conf ]
 then
-	cp ./autopache.conf $VHOSTDIR/$SITENAME$SUFFIX
+        cp ./autopache.conf $VHOSTDIR/$SITENAME$SUFFIX
 elif [ -e /etc/autopache.conf ]
 then
-	cp /etc/autopache.conf $VHOSTDIR/$SITENAME$SUFFIX
+        cp /etc/autopache.conf $VHOSTDIR/$SITENAME$SUFFIX
 else
-	echo "You silly billy - I can't find autopache.conf in /etc or the current directory."
+        echo "You silly billy - I can't find autopache.conf in /etc or the current directory."
 fi
 
 sed -i "s%$DIRENTRY%$CURDIR%g" $VHOSTDIR/$SITENAME$SUFFIX
 sed -i "s%$NAMEENTRY%$SITENAME%g" $VHOSTDIR/$SITENAME$SUFFIX
+sed -i "s%$LOGPATHENTRY%$LOGPATH%g" $VHOSTDIR/$SITENAME$SUFFIX
 
 if [[ $RELEASENAME == Debian ]]
 then
     a2ensite $SITENAME
 fi
 
-/etc/init.d/apache2 restart
+if [[ $RELEASENAME == Amazon ]]
+then
+    /etc/init.d/httpd restart
+else
+    /etc/init.d/apache2 restart
+fi
+
 echo 127.0.0.1 $SITENAME >> /etc/hosts
 
 if [ "--open" == "$2" ]
 then
-	USER=$(who am i | gawk '{print $1}')
-	su - $USER xdg-open http://$SITENAME/
+        USER=$(who am i | gawk '{print $1}')
+        su - $USER xdg-open http://$SITENAME/
 fi
-
-
