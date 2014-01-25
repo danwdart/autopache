@@ -1,0 +1,2 @@
+0.5: Removed NameVirtualHost directive, bumped version number so as not to confuse branchers
+0.3: Apache 2.4 support
