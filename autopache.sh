@@ -59,7 +59,7 @@ SITENAME=$1
 if [ -z "$1" ]
 then
         echo "Usage: autopache.sh server-name-here.tld [--delete|--open]"
-        exit 255 
+        exit 255
 fi
 DIRENTRY="{{DIR}}"
 CURDIR=$(pwd)
